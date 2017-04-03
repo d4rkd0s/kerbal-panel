@@ -18,32 +18,63 @@
  
  */
 
+// ASCII Code for backspace is 08
+const int keyToPress = 8;
+
 // Constants that won't change
 const int abortButton = 2; // The number of the abortButton pin
 
 // Setup a light for now
-const int ledPin = 13;
+const int buttonLed = 3;
 
 // Variables will change:
 int abortStatus = 0; // Variable for tracking the abortButton status
+
+// Boolean to track if the button is pressed
+bool btnstatus = false;
 
 void setup() {
   // Initialize the abortButton pin as an input
   pinMode(abortButton, INPUT);
   // Setup the Keyboard
   Keyboard.begin();
+  
 }
 
 void loop() {
-  // Read the state of the abortButton and load it into the abortStatus
-  abortStatus = digitalRead(abortButton);
+  // fade in from min to max in increments of 5 points:
+  for (int fadeValue = 0 ; fadeValue <= 255; fadeValue += 5) {
+    // sets the value (range from 0 to 255):
+    analogWrite(buttonLed, fadeValue);
+    checkButton();
+    // wait for 30 milliseconds to see the dimming effect
+    delay(30);
+  }
 
-  // Check if the abortButton is pressed
-  if (abortStatus == HIGH) {
-    // turn LED on:
-    digitalWrite(ledPin, HIGH);
-  } else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW);
+  // fade out from max to min in increments of 5 points:
+  for (int fadeValue = 255 ; fadeValue >= 0; fadeValue -= 5) {
+    // sets the value (range from 0 to 255):
+    analogWrite(buttonLed, fadeValue);
+    checkButton();
+    // wait for 30 milliseconds to see the dimming effect
+    delay(30);
   }
 }
+
+void checkButton() {
+  // Read the state of the abortButton and load it into the abortStatus
+  abortStatus = digitalRead(abortButton);
+  // Check if the abortButton is pressed
+  if (abortStatus == HIGH && btnstatus == true) {
+     Serial.print("Abort Button is NOT pressed");
+     btnstatus = false;
+     Serial.print('\n');
+  } else if(abortStatus == LOW && btnstatus == false) {
+    // turn LED off:
+    Serial.print("Abort Button is pressed");
+    Keyboard.write(keyToPress);
+    btnstatus = true;
+    Serial.print('\n');
+  }
+}
+
