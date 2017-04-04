@@ -1,14 +1,14 @@
 #include <Keyboard.h>
 
 /*
- KSP Abort Button
+ KSP Panel
 
- When the button connected to Digital Pin 2 is pressed
- the arduino will emulate a keyboard press of "backspace"
- which in Kerbal Space Program initiates the abort sequence.
+ When the joystick with 4 buttons is pressed the arduino
+ will emulate the pressing and holding of W A S and D to
+ allow for movement in Kerbal Space Program
 
  The circuit:
- * pushbutton attached to pin 2
+ * 4 normally open switches are connected from ground to digital pins 0,1,2,3
 
  Created in 2017
  by d4rkd0s <http://d4rkd0s.me>
@@ -18,8 +18,11 @@
  
  */
 
-// ASCII Code for backspace is 08
-const int keyToPress = 8;
+// ASCII Codes for WASD
+const int left = 65;
+const int down = 83;
+const int right = 68;
+const int up = 87;
 
 // Constants that won't change
 const int leftButton = 0; // The number of the leftButton pin
@@ -27,38 +30,31 @@ const int downButton = 1; // The number of the downButton pin
 const int rightButton = 2; // The number of the rightButton pin
 const int upButton = 3; // The number of the upButton pin
 
-// Setup a light for now
-const int buttonLed = 3;
-
-// Variables will change:
+// Variables will change as we loop
 int leftButtonActual = 0; // Variable for tracking the abortButton status
 int downButtonActual = 0; // Variable for tracking the abortButton status
 int rightButtonActual = 0; // Variable for tracking the abortButton status
 int upButtonActual = 0; // Variable for tracking the abortButton status
 
-
-// Boolean to track if the buttons are pressed
+// Booleans to track if the buttons are pressed
 bool leftButtonStatus = false;
 bool downButtonStatus = false;
 bool rightButtonStatus = false;
 bool upButtonStatus = false;
 
 void setup() {
-  // Initialize the abortButton pin as an input
+  // Initialize the buttons pin as inputs
   pinMode(leftButton, INPUT_PULLUP);
   pinMode(downButton, INPUT_PULLUP);
   pinMode(rightButton, INPUT_PULLUP);
   pinMode(upButton, INPUT_PULLUP);
   // Setup the Keyboard
   Keyboard.begin();
- 
 }
 
 void loop() {
   checkButton();
   delay(33);
-//  Serial.print("Checking status...");
-//  Serial.print('\n');
 }
 
 void checkButton() {
@@ -66,74 +62,64 @@ void checkButton() {
   leftButtonActual = digitalRead(leftButton);
   downButtonActual = digitalRead(downButton);
   rightButtonActual = digitalRead(rightButton);
-  upButtonActual = digitalRead(upButton);
-
-//  Serial.print("Left button actual");
-//  Serial.print('\n');
-//  Serial.print(leftButtonActual);
-//  Serial.print('\n');
-//  Serial.print("Down button actual");
-//  Serial.print('\n');
-//  Serial.print(downButtonActual);
-//  Serial.print('\n');
-//  Serial.print("Right button actual");
-//  Serial.print('\n');
-//  Serial.print(rightButtonActual);
-//  Serial.print('\n');
-//  Serial.print("Up button actual");
-//  Serial.print('\n');
-//  Serial.print(upButtonActual);
-//  Serial.print('\n');
- 
+  upButtonActual = digitalRead(upButton); 
   
-  // Check if the leftButton is pressed
+  // Check if the left button is pressed
   if (leftButtonActual == LOW && leftButtonStatus == false) {
      Serial.print("Left button was pressed");
+     Keyboard.press(left);
      leftButtonStatus = true;
      Serial.print('\n');
   } else {
     if(leftButtonActual == HIGH && leftButtonStatus == true) {
       Serial.print("Left button was released");
+      Keyboard.release(left);
       //Keyboard.write(keyToPress);
       leftButtonStatus = false;
       Serial.print('\n');
     }
   }
 
+  // Check if the down button is pressed
   if (downButtonActual == LOW && downButtonStatus == false) {
      Serial.print("Down button was pressed");
+     Keyboard.press(down);
      downButtonStatus = true;
      Serial.print('\n');
   } else {
     if(downButtonActual == HIGH && downButtonStatus == true) {
       Serial.print("Down button was released");
-      //Keyboard.write(keyToPress);
+      Keyboard.release(down);
       downButtonStatus = false;
       Serial.print('\n');
     }
   }
 
+  // Check if the right button is pressed
   if (rightButtonActual == LOW && rightButtonStatus == false) {
      Serial.print("Right button was pressed");
+     Keyboard.press(right);
      rightButtonStatus = true;
      Serial.print('\n');
   } else {
     if(rightButtonActual == HIGH && rightButtonStatus == true) {
       Serial.print("Right button was released");
-      //Keyboard.write(keyToPress);
+      Keyboard.release(right);
       rightButtonStatus = false;
       Serial.print('\n');
     }
   }
 
+  // Check if the up button is pressed
   if (upButtonActual == LOW && upButtonStatus == false) {
      Serial.print("Up button was pressed");
+     Keyboard.press(up);
      upButtonStatus = true;
      Serial.print('\n');
   } else {
     if(upButtonActual == HIGH && upButtonStatus == true) {
       Serial.print("Up button was released");
-      //Keyboard.write(keyToPress);
+      Keyboard.release(up);
       upButtonStatus = false;
       Serial.print('\n');
     }
