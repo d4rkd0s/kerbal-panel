@@ -86,7 +86,7 @@ void loop() {
   if (digitalRead(yellowButton) == LOW) {
     soundAlarm(10);
     // Press space
-    Keyboard.write(32);
+    Keyboard.write((char) 0x20);
     delay(150);
   }
   if (digitalRead(whiteButton) == LOW) {
