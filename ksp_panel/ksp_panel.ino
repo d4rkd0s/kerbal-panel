@@ -19,10 +19,11 @@ ASASSSSSSWSAASASASASAS
  */
 
 // ASCII Codes for WASD
-const int left = 65;
-const int down = 83;
-const int right = 68;
-const int up = 87;
+int left = 65;
+int down = 83;
+int right = 68;
+int up = 87;
+bool rcsMode = false;
 const int alarmDelay = 0;
 
 // Constants that won't change
@@ -72,30 +73,31 @@ void setup() {
 
 void loop() {
   if (digitalRead(redButton) == LOW) {
-    soundAlarm(100);
+    soundAlarm(10);
     // Press backspace
     Keyboard.write(KEY_BACKSPACE);
     delay(150);
   }
   if (digitalRead(greenButton) == LOW) {
-    soundAlarm(100);
+    soundAlarm(10);
     // Press R
     Keyboard.write(82);
     delay(150);
   }
   if (digitalRead(yellowButton) == LOW) {
-    soundAlarm(100);
+    soundAlarm(10);
     // Press space
     Keyboard.write(32);
     delay(150);
   }
   if (digitalRead(whiteButton) == LOW) {
-    soundAlarm(1000);
+    soundAlarm(100);
     // Utility
+    flipControls();
     delay(1000);
   }
   if (digitalRead(blueButton) == LOW) {
-    soundAlarm(100);
+    soundAlarm(10);
     // Press T
     Keyboard.write(84);
     delay(150);
@@ -109,6 +111,23 @@ void soundAlarm(int alarmLength) {
   digitalWrite(alarm, HIGH);
   delay(alarmDelay + alarmLength);
   digitalWrite(alarm, LOW);
+}
+
+void flipControls() {
+  if(rcsMode) {
+    left = 65;
+    down = 83;
+    right = 68;
+    up = 87;
+    rcsMode = false;
+  } else {
+    soundAlarm(1000);
+    left = 74;
+    down = 78;
+    right = 76;
+    up = 72;
+    rcsMode = true;
+  }
 }
 
 void checkButton() {
