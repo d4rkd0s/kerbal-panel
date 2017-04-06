@@ -9,9 +9,9 @@
 
  The circuit:
  * 4 normally open switches are connected from ground to digital pins 0,1,2,3
-
+ASASSSSSSWSAASASASASAS
  Created in 2017
- by d4rkd0s <http://d4rkd0s.me>
+ by d4rkd0s <http://d4rkd0s.me>AAAAAAAAAAADAWSDWAAWWAWWSDAADDDDADWSAWDS
 
  This code is licensed under the GNU GPL v3.0
  https://raw.githubusercontent.com/d4rkd0s/kerbal-panel/master/LICENSE
@@ -23,12 +23,21 @@ const int left = 65;
 const int down = 83;
 const int right = 68;
 const int up = 87;
+const int alarmDelay = 0;
 
 // Constants that won't change
 const int leftButton = 0; // The number of the leftButton pin
 const int downButton = 1; // The number of the downButton pin
 const int rightButton = 2; // The number of the rightButton pin
 const int upButton = 3; // The number of the upButton pin
+const int lockButton = 4; // The number of the upButton pin
+const int alarm = 5; // The number of the upButton pin
+
+const int redButton = 6; // The number of the leftButton pin
+const int greenButton = 7; // The number of the downButton pin
+const int yellowButton = 8; // The number of the rightButton pin
+const int whiteButton = 9; // The number of the upButton pin
+const int blueButton = 10; // The number of the upButton pin
 
 // Variables will change as we loop
 int leftButtonActual = 0; // Variable for tracking the abortButton status
@@ -48,13 +57,58 @@ void setup() {
   pinMode(downButton, INPUT_PULLUP);
   pinMode(rightButton, INPUT_PULLUP);
   pinMode(upButton, INPUT_PULLUP);
+  pinMode(lockButton, INPUT_PULLUP);
+
+  pinMode(redButton, INPUT_PULLUP);
+  pinMode(greenButton, INPUT_PULLUP);
+  pinMode(yellowButton, INPUT_PULLUP);
+  pinMode(whiteButton, INPUT_PULLUP);
+  pinMode(blueButton, INPUT_PULLUP);
+  
+  pinMode(alarm, OUTPUT);
   // Setup the Keyboard
   Keyboard.begin();
 }
 
 void loop() {
+  if (digitalRead(redButton) == LOW) {
+    soundAlarm(100);
+    // Press backspace
+    Keyboard.write(KEY_BACKSPACE);
+    delay(150);
+  }
+  if (digitalRead(greenButton) == LOW) {
+    soundAlarm(100);
+    // Press R
+    Keyboard.write(82);
+    delay(150);
+  }
+  if (digitalRead(yellowButton) == LOW) {
+    soundAlarm(100);
+    // Press space
+    Keyboard.write(32);
+    delay(150);
+  }
+  if (digitalRead(whiteButton) == LOW) {
+    soundAlarm(1000);
+    // Utility
+    delay(1000);
+  }
+  if (digitalRead(blueButton) == LOW) {
+    soundAlarm(100);
+    // Press T
+    Keyboard.write(84);
+    delay(150);
+  }
+  
   checkButton();
   delay(33);
+}
+
+void soundAlarm(int alarmLength) {
+  digitalWrite(alarm, HIGH);
+  delay(alarmDelay + alarmLength);
+  digitalWrite(alarm, LOW);
 }
 
 void checkButton() {
