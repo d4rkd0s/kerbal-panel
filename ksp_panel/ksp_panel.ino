@@ -18,11 +18,11 @@ ASASSSSSSWSAASASASASAS
  
  */
 
-// ASCII Codes for WASD
-int left = 65;
-int down = 83;
-int right = 68;
-int up = 87;
+// ASCII Codes for wasd
+int left = 97;
+int down = 115;
+int right = 100;
+int up = 119;
 bool rcsMode = false;
 const int alarmDelay = 0;
 
@@ -80,8 +80,8 @@ void loop() {
   }
   if (digitalRead(greenButton) == LOW) {
     soundAlarm(10);
-    // Press R
-    Keyboard.write(82);
+    // Press r
+    Keyboard.write(114);
     delay(150);
   }
   if (digitalRead(yellowButton) == LOW) {
@@ -98,8 +98,8 @@ void loop() {
   }
   if (digitalRead(blueButton) == LOW) {
     soundAlarm(10);
-    // Press T
-    Keyboard.write(84);
+    // Press t
+    Keyboard.write(116);
     delay(150);
   }
   
@@ -115,17 +115,17 @@ void soundAlarm(int alarmLength) {
 
 void flipControls() {
   if(rcsMode) {
-    left = 65;
-    down = 83;
-    right = 68;
-    up = 87;
+    left = 97;
+    down = 115;
+    right = 100;
+    up = 119;
     rcsMode = false;
   } else {
     soundAlarm(1000);
-    left = 74;
-    down = 78;
-    right = 76;
-    up = 72;
+    left = 106;
+    down = 110;
+    right = 108;
+    up = 104;
     rcsMode = true;
   }
 }
