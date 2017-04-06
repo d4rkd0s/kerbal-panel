@@ -9,9 +9,8 @@
 
  The circuit:
  * 4 normally open switches are connected from ground to digital pins 0,1,2,3
-ASASSSSSSWSAASASASASAS
  Created in 2017
- by d4rkd0s <http://d4rkd0s.me>AAAAAAAAAAADAWSDWAAWWAWWSDAADDDDADWSAWDS
+ by d4rkd0s <http://d4rkd0s.me>
 
  This code is licensed under the GNU GPL v3.0
  https://raw.githubusercontent.com/d4rkd0s/kerbal-panel/master/LICENSE
