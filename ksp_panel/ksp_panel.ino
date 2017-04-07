@@ -32,6 +32,7 @@ const int rightButton = 2; // The number of the rightButton pin
 const int upButton = 3; // The number of the upButton pin
 const int lockButton = 4; // The number of the upButton pin
 const int alarm = 5; // The number of the upButton pin
+const int speakerOut = 11; // The number of the upButton pin
 
 const int redButton = 6; // The number of the leftButton pin
 const int greenButton = 7; // The number of the downButton pin
@@ -51,6 +52,81 @@ bool downButtonStatus = false;
 bool rightButtonStatus = false;
 bool upButtonStatus = false;
 
+// TONES  ==========================================
+// Start by defining the relationship between 
+//       note, period, &  frequency. 
+#define  a     3900    // 261 Hz old:3830
+#define  b     3038    // 329 Hz 
+#define  c     2272    // 440 Hz 
+#define  d     1900    // 523 Hz old:1912
+// Define a special note, 'R', to represent a rest
+#define  R     0
+
+// MELODY and TIMING  =======================================
+//  melody[] is an array of notes, accompanied by beats[], 
+//  which sets each note's relative length (higher #, longer note) 
+int melody[] = {   a,  b,  c,  a,  b,  c,  d };
+int beats[]  = {  20, 20, 20, 20, 20, 20, 20 }; 
+int MAX_COUNT = sizeof(melody) / 2; // Melody length, for looping.
+
+// Set overall tempo
+long tempo = 5000;
+// Set length of pause between notes
+int pause = 150;
+// Loop variable to increase Rest length
+int rest_count = 100; //<-BLETCHEROUS HACK; See NOTES
+
+// Initialize core variables
+int tone_ = 0;
+int beat = 0;
+long duration  = 0;
+
+bool startupTone = false;
+bool systemPower = false;
+
+// PLAY TONE  ==============================================
+// Pulse the speaker to play a tone for a particular duration
+void playTone() {
+  long elapsed_time = 0;
+  if (tone_ > 0) { // if this isn't a Rest beat, while the tone has 
+    //  played less long than 'duration', pulse speaker HIGH and LOW
+    while (elapsed_time < duration) {
+
+      digitalWrite(speakerOut,HIGH);
+      delayMicroseconds(tone_ / 2);
+
+      // DOWN
+      digitalWrite(speakerOut, LOW);
+      delayMicroseconds(tone_ / 2);
+
+      // Keep track of how long we pulsed
+      elapsed_time += (tone_);
+    } 
+  }
+  else { // Rest beat; loop times delay
+    for (int j = 0; j < rest_count; j++) { // See NOTE on rest_count
+      delayMicroseconds(duration);  
+    }                                
+  }                                 
+}
+
+void playStartup() {
+  // Set up a counter to pull from melody[] and beats[]
+  for (int i=0; i<MAX_COUNT; i++) {
+    tone_ = melody[i];
+    beat = beats[i];
+
+    duration = beat * tempo; // Set up timing
+
+    playTone(); 
+    // A pause between notes...
+    delay(pause);
+  }
+  delay(100);
+  soundAlarm(100);
+}
+
+
 void setup() {
   // Initialize the buttons pin as inputs
   pinMode(leftButton, INPUT_PULLUP);
@@ -66,11 +142,35 @@ void setup() {
   pinMode(blueButton, INPUT_PULLUP);
   
   pinMode(alarm, OUTPUT);
+  pinMode(speakerOut, OUTPUT);
   // Setup the Keyboard
   Keyboard.begin();
 }
 
-void loop() {
+void soundAlarm(int alarmLength) {
+  digitalWrite(alarm, HIGH);
+  delay(alarmDelay + alarmLength);
+  digitalWrite(alarm, LOW);
+}
+
+void flipControls() {
+  if(rcsMode) {
+    left = 97;
+    down = 115;
+    right = 100;
+    up = 119;
+    rcsMode = false;
+  } else {
+    soundAlarm(1000);
+    left = 106;
+    down = 110;
+    right = 108;
+    up = 104;
+    rcsMode = true;
+  }
+}
+
+void checkButtons() {
   if (digitalRead(redButton) == LOW) {
     soundAlarm(10);
     // Press backspace
@@ -101,35 +201,9 @@ void loop() {
     Keyboard.write(116);
     delay(150);
   }
-  
-  checkButton();
-  delay(33);
 }
 
-void soundAlarm(int alarmLength) {
-  digitalWrite(alarm, HIGH);
-  delay(alarmDelay + alarmLength);
-  digitalWrite(alarm, LOW);
-}
-
-void flipControls() {
-  if(rcsMode) {
-    left = 97;
-    down = 115;
-    right = 100;
-    up = 119;
-    rcsMode = false;
-  } else {
-    soundAlarm(1000);
-    left = 106;
-    down = 110;
-    right = 108;
-    up = 104;
-    rcsMode = true;
-  }
-}
-
-void checkButton() {
+void checkJoystick() {
   // Read the state of the buttons and load it into the buttonStatus vars
   leftButtonActual = digitalRead(leftButton);
   downButtonActual = digitalRead(downButton);
@@ -198,4 +272,23 @@ void checkButton() {
   }
  
 }
+
+void loop() {
+  if(digitalRead(lockButton) == LOW) {
+    if(startupTone == false) {
+      delay(500);
+      playStartup();
+      startupTone = true;
+    }
+    checkButtons();
+    checkJoystick();
+  } else {
+    startupTone = false;
+  }
+  delay(33);
+}
+
+
+
+
 
