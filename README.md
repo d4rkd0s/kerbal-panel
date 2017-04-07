@@ -32,4 +32,4 @@ The kerbal abort button is the easiest one in the collection and can be used wit
 
 The kerbal panel is a joystick with 4 normally open switched and 5 buttons with lights in them.
 
-![KSP Panel](/ksp_panel/ksp_panel.JPG?raw=true "KSP Panel")
+![KSP Panel](/ksp_panel/ksp_panel.jpg?raw=true "KSP Panel")
