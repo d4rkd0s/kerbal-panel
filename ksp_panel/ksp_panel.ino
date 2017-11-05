@@ -17,28 +17,35 @@
  
  */
 
+ // Settings
+bool rcsMode = false; // RCS disabled by default
+bool startupTone = false; // Play startup tone or not
+bool systemPower = false; // If the system should be on/off when booted, if off key switch is used to change this to "on"
+
+
+/***********Software below, change if you know what you are doing***********/
+
+
 // ASCII Codes for wasd
-int left = 97;
-int down = 115;
-int right = 100;
-int up = 119;
-bool rcsMode = false;
-const int alarmDelay = 0;
+int left = 97; // Code for A
+int down = 115; // Code for S
+int right = 100; // Code for D
+int up = 119; // Code for W
 
 // Constants that won't change
+const int alarmDelay = 0; // Set the delay for the alarm to 0
 const int leftButton = 0; // The number of the leftButton pin
 const int downButton = 1; // The number of the downButton pin
 const int rightButton = 2; // The number of the rightButton pin
 const int upButton = 3; // The number of the upButton pin
-const int lockButton = 4; // The number of the upButton pin
-const int alarm = 5; // The number of the upButton pin
-const int speakerOut = 11; // The number of the upButton pin
-
-const int redButton = 6; // The number of the leftButton pin
-const int greenButton = 7; // The number of the downButton pin
-const int yellowButton = 8; // The number of the rightButton pin
-const int whiteButton = 9; // The number of the upButton pin
-const int blueButton = 10; // The number of the upButton pin
+const int lockButton = 4; // The number of the lockButton pin
+const int alarm = 5; // The number of the alarm pin
+const int speakerOut = 11; // The number of the speaker pin
+const int redButton = 6; // The number of the red button pin
+const int greenButton = 7; // The number of the green button pin
+const int yellowButton = 8; // The number of the yellow button pin
+const int whiteButton = 9; // The number of the white button pin
+const int blueButton = 10; // The number of the blue button pin
 
 // Variables will change as we loop
 int leftButtonActual = 0; // Variable for tracking the abortButton status
@@ -52,7 +59,7 @@ bool downButtonStatus = false;
 bool rightButtonStatus = false;
 bool upButtonStatus = false;
 
-// TONES  ==========================================
+// Tones
 // Start by defining the relationship between 
 //       note, period, &  frequency. 
 #define  a     3900    // 261 Hz old:3830
@@ -62,7 +69,7 @@ bool upButtonStatus = false;
 // Define a special note, 'R', to represent a rest
 #define  R     0
 
-// MELODY and TIMING  =======================================
+// Melody and Timing
 //  melody[] is an array of notes, accompanied by beats[], 
 //  which sets each note's relative length (higher #, longer note) 
 int melody[] = {   a,  b,  c,  a,  b,  c,  d };
@@ -81,24 +88,17 @@ int tone_ = 0;
 int beat = 0;
 long duration  = 0;
 
-bool startupTone = false;
-bool systemPower = false;
-
-// PLAY TONE  ==============================================
-// Pulse the speaker to play a tone for a particular duration
+// playTone - Pulse the speaker to play a tone for a particular duration
 void playTone() {
   long elapsed_time = 0;
   if (tone_ > 0) { // if this isn't a Rest beat, while the tone has 
     //  played less long than 'duration', pulse speaker HIGH and LOW
     while (elapsed_time < duration) {
-
       digitalWrite(speakerOut,HIGH);
       delayMicroseconds(tone_ / 2);
-
       // DOWN
       digitalWrite(speakerOut, LOW);
       delayMicroseconds(tone_ / 2);
-
       // Keep track of how long we pulsed
       elapsed_time += (tone_);
     } 
@@ -110,23 +110,24 @@ void playTone() {
   }                                 
 }
 
+// playStartup - Plays a startup tone using the playTone function
 void playStartup() {
   // Set up a counter to pull from melody[] and beats[]
   for (int i=0; i<MAX_COUNT; i++) {
     tone_ = melody[i];
     beat = beats[i];
-
     duration = beat * tempo; // Set up timing
-
     playTone(); 
     // A pause between notes...
     delay(pause);
   }
   delay(100);
+  // Sound alarm beep once done
   soundAlarm(100);
 }
 
 
+// setup - Setup the pin modes and keyboard plug n play
 void setup() {
   // Initialize the buttons pin as inputs
   pinMode(leftButton, INPUT_PULLUP);
@@ -147,12 +148,14 @@ void setup() {
   Keyboard.begin();
 }
 
+// soundAlarm - Function to sound an alarm for "alarmLength" in miliseconds 
 void soundAlarm(int alarmLength) {
   digitalWrite(alarm, HIGH);
   delay(alarmDelay + alarmLength);
   digitalWrite(alarm, LOW);
 }
 
+// flipControls - Flips the controls from flight mode to RCS/docking mode
 void flipControls() {
   if(rcsMode) {
     left = 97;
@@ -170,7 +173,7 @@ void flipControls() {
   }
 }
 
-void checkButtons() {
+// checkButtons - Function that checks which buttons are pressed and executes code
   if (digitalRead(redButton) == LOW) {
     soundAlarm(10);
     // Press backspace
@@ -203,6 +206,7 @@ void checkButtons() {
   }
 }
 
+// checkJoystick - Function that checks the joystick inputs pressed and executes code
 void checkJoystick() {
   // Read the state of the buttons and load it into the buttonStatus vars
   leftButtonActual = digitalRead(leftButton);
@@ -273,6 +277,7 @@ void checkJoystick() {
  
 }
 
+// loop - main code ran over and over
 void loop() {
   if(digitalRead(lockButton) == LOW) {
     if(startupTone == false) {
